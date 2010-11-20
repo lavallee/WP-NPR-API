@@ -13,7 +13,7 @@ class NPR_API_Client {
     }
 
     function story_from_id( $id ) {
-        $response = $this->_api_request( array( 'storyId' => $id ) );
+        $response = $this->_api_request( array( 'id' => $id ) );
         foreach ( $response->list->story as $story ) {
             if ( $story->id == $id ) {
                 return $story;
