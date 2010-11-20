@@ -16,17 +16,24 @@ class NPR_API {
         ?>
         <div class="wrap">
             <?php screen_icon(); ?>
+            <form action="" method="POST">
             <h2>Get NPR Stories</h2>
-                URL or Story ID: <input type="text" name="url_or_story_id" value="" />
-                <input type="submit" value="Create Draft" />
-
-
-        <?php 
-        //global $current_screen;
-        //var_dump( $current_screen );
-        ?>
-        </div>
+            Enter an NPR Story ID: <input type="text" name="story_id" value="" />
+            <input type="submit" value="Create Draft" />
+            </form>
+       </div>
         <?php
+    }
+
+    function load_page_hook() {
+        if ( isset( $_POST ) && isset( $_POST[ 'story_id' ] ) ) {
+            $story_id = absint( $_POST[ 'story_id' ] );
+
+            // XXX: check that the API key is actually set
+            $api = new NPR_API_Client( get_option( 'npr_api_key' ) );
+            $story = $api->story_from_id( $story_id );
+            var_dump( $story );
+        }
     }
 
     function admin_menu() {
@@ -39,6 +46,7 @@ class NPR_API {
         }
 
         add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
+        add_action( 'load-posts_page_get-npr-stories', array( &$this, 'load_page_hook' ) );
     }
 }
 
