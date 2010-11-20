@@ -1,12 +1,6 @@
 <?php
 
 /*
-Plugin Name: WP-NPR-API
-Plugin URI: http://npr.org/
- */
-
-
-/*
  * NPR API Settings Page and related control methods.
  */
 function npr_add_options_page() {
