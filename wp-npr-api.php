@@ -32,7 +32,13 @@ class NPR_API {
             // XXX: check that the API key is actually set
             $api = new NPR_API_Client( get_option( 'npr_api_key' ) );
             $story = $api->story_from_id( $story_id );
-            var_dump( $story );
+            $created = $api->update_post_from_story( $story );
+            if ( $created ) {
+                echo 'Post created as a draft';
+            }
+            else {
+                echo 'Existing post updated';
+            }
         }
     }
 
