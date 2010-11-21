@@ -17,7 +17,6 @@ class NPR_API_Client {
         if ( $response ) {
             foreach ( $response->list->story as $story ) {
                 if ( $story->id == $id ) {
-                    var_dump( $story );
                     return $story;
                 }
             }
@@ -40,13 +39,7 @@ class NPR_API_Client {
         else {
             // XXX: handle errors in JSON payload of successful response
             $resp = wp_remote_retrieve_body( $response );
-            $json = json_decode( wp_remote_retrieve_body( $resp ) );
-            if ( $json ) {
-                return $json;
-            }
-            else {
-                // XXX: Handle rror
-            }
+            return json_decode( $resp );
         }
     }
 
