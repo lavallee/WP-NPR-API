@@ -33,7 +33,6 @@ class NPR_API_Client {
         $params = wp_parse_args( $args, $defaults );
 
         $url = add_query_arg( $params, NPR_API_URL );
-        var_dump( $url );
         $response = wp_remote_get( $url );
         if ( is_wp_error( $response ) ) {
             // XXX: Handle error
