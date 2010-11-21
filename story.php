@@ -41,6 +41,7 @@ class NPR_Story {
     public $id;
     public $html_link;
     public $short_link;
+    public $api_link;
     public $title;
     //public $subtitle;
     //public $shortTitle;
