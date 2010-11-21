@@ -4,6 +4,9 @@ define( 'NPR_API_URL', 'http://api.npr.org/query' );
 define( 'OUTPUT_FORMAT', 'JSON' );
 define( 'FIELDS', 'all' );
 define( 'STORY_ID_META_KEY', 'npr_story_id' );
+define( 'API_LINK_META_KEY', 'npr_api_link' );
+define( 'HTML_LINK_META_KEY', 'npr_html_link' );
+define( 'SHORT_LINK_META_KEY', 'npr_short_link' );
 
 require_once( 'story.php' );
 
@@ -18,7 +21,7 @@ class NPR_API_Client {
 
     function story_from_id( $id ) {
         $response = $this->_api_request( array( 'id' => $id ) );
-        var_dump( $response );
+        //var_dump( $response );
         if ( $response ) {
             foreach ( $response->list->story as $story ) {
                 if ( $story->id == $id ) {
@@ -67,6 +70,9 @@ class NPR_API_Client {
         );
         $metas = array(
             STORY_ID_META_KEY => $story->id,
+            API_LINK_META_KEY => $story->api_link,
+            HTML_LINK_META_KEY => $story->html_link,
+            SHORT_LINK_META_KEY => $story->short_link,
         );
 
         if ( $existing ) {

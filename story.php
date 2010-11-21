@@ -3,7 +3,6 @@
 class JSON_Story_Converter {
     function convert( $api_story ) {
         $text = '$text'; // HACK to deal with API response keys
-        //var_dump( $api_story );
         $story = new NPR_Story();
         $story->id         = $api_story->id;
         $story->title      = $api_story->title->$text;
@@ -12,6 +11,7 @@ class JSON_Story_Converter {
         $story->html_link  = $this->_get_link_by_type( 'html', $api_story );
         $story->short_link = $this->_get_link_by_type( 'short', $api_story );
         $story->api_link   = $this->_get_link_by_type( 'api', $api_story );
+        //var_dump( $story );
         return $story;
     }
 
