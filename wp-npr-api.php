@@ -42,12 +42,18 @@ class NPR_API {
 
     function get_npr_stories() {
         // XXX: check to make sure the api key has been installed.
+        
+        if ( get_option( NPR_API_KEY ) ) { 
+            $api = new NPR_API_CLIENT( get_option( NPR_API_KEY_OPTION ) );
+            $recent_stories = $api->recent_stories();
+        }
+        
         ?>
         <div class="wrap">
             <?php screen_icon(); ?>
             <form action="" method="POST">
             <h2>Get NPR Stories</h2>
-            <?php if ( ! get_option( NPR_API_KEY_OPTION ) ) : ?>
+            <?php if ( ! $api ) : ?>
             <div class="error">
                 <p>You don't currently have an API key set.  <a href="<?php menu_page_url( 'npr_api' ); ?>">Set your API key here.</a></p>
             </div>
@@ -61,7 +67,46 @@ class NPR_API {
             Enter an NPR Story ID: <input type="text" name="story_id" value="" />
             <input type="submit" value="Create Draft" />
             </form>
-
+            
+            <?php if ( $api ): ?>
+            <div class="tablenav">
+                <div class="alignleft actions">
+                    <p class="displaying-num">Displaying <?php echo count($recent_stories) ?> recent stories.</p>
+                </div>
+            </div>
+            
+            <hr />
+            
+            <table cellspacing="0" id="install-plugins" class="widefat" style="clear:none;">
+                <thead>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">ID</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">ID</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                <?php foreach( $recent_stories as $story ): ?>
+                        <tr>
+                            <td class="name">
+                                <a href="<?php echo $story->link ?>" title="<?php echo $story->title ?>" target="_blank">
+                                    <?php echo $story->title ?>
+                                </a>
+                            </td>
+                            <td><?php echo $story->teaser ?></td>
+                            <td><?php echo $story->id ?></td>
+                        </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php endif; ?>
        </div>
         <?php
     }
