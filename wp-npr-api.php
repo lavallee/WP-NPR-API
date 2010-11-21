@@ -18,6 +18,14 @@ class NPR_API {
     function load_page_hook() {
         if ( isset( $_POST ) && isset( $_POST[ 'story_id' ] ) ) {
             $story_id = absint( $_POST[ 'story_id' ] );
+            
+        }
+        else if ( isset( $_GET[ 'create_draft' ] ) && isset( $_GET[ 'story_id' ] ) ) {
+            $story_id = absint( $_GET[ 'story_id' ] );
+        }
+        
+        
+        if ( isset( $story_id ) ) {
 
             // XXX: check that the API key is actually set
             $api = new NPR_API_Client( get_option( NPR_API_KEY_OPTION ) );
@@ -59,7 +67,7 @@ class NPR_API {
                 <p>You don't currently have an API key set.  <a href="<?php menu_page_url( 'npr_api' ); ?>">Set your API key here.</a></p>
             </div>
             <?php endif; 
-            if ( isset( $_POST ) and isset( $_POST[ 'story_id' ] ) ): ?>
+            if ( ( isset( $_POST ) and isset( $_POST[ 'story_id' ] ) ) || ( isset( $_GET['create_draft'] ) && isset( $_GET['story_id'] ) ) ): ?>
             <div class="updated">
                 <p><?php echo $this->created_message; ?></p>
             </div>
@@ -84,6 +92,7 @@ class NPR_API {
                         <th scope="col">Title</th>
                         <th scope="col">Description</th>
                         <th scope="col">ID</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -91,6 +100,7 @@ class NPR_API {
                         <th scope="col">Title</th>
                         <th scope="col">Description</th>
                         <th scope="col">ID</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </tfoot>
                 <tbody>
@@ -103,6 +113,12 @@ class NPR_API {
                             </td>
                             <td><?php echo $story->teaser ?></td>
                             <td><?php echo $story->id ?></td>
+                            
+                            <td>
+                                <a href="<?php echo add_query_arg( array('story_id' => $story->id, 'create_draft' => 'true' ), menu_page_url( 'get-npr-stories', false ) ) ?>">
+                                    Save to Drafts
+                                </a>
+                            </td>
                         </tr>
                 <?php endforeach; ?>
                 </tbody>
