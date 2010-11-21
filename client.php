@@ -63,15 +63,15 @@ class NPR_API_Client {
         }
 
         $args = array(
-            'post_title' => $story->title,
+            'post_title'   => $story->title,
             'post_content' => $story->content,
             'post_excerpt' => $story->teaser,
-            'post_status' => 'draft',
+            'post_status'  => 'draft',
         );
         $metas = array(
-            STORY_ID_META_KEY => $story->id,
-            API_LINK_META_KEY => $story->api_link,
-            HTML_LINK_META_KEY => $story->html_link,
+            STORY_ID_META_KEY   => $story->id,
+            API_LINK_META_KEY   => $story->api_link,
+            HTML_LINK_META_KEY  => $story->html_link,
             SHORT_LINK_META_KEY => $story->short_link,
         );
 
