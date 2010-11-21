@@ -14,9 +14,12 @@ class NPR_API_Client {
 
     function story_from_id( $id ) {
         $response = $this->_api_request( array( 'id' => $id ) );
-        foreach ( $response->list->story as $story ) {
-            if ( $story->id == $id ) {
-                return $story;
+        if ( $response ) {
+            foreach ( $response->list->story as $story ) {
+                if ( $story->id == $id ) {
+                    var_dump( $story );
+                    return $story;
+                }
             }
         }
     }
@@ -30,13 +33,21 @@ class NPR_API_Client {
         $params = wp_parse_args( $args, $defaults );
 
         $url = add_query_arg( $params, NPR_API_URL );
+        var_dump( $url );
         $response = wp_remote_get( $url );
         if ( is_wp_error( $response ) ) {
-            // XXX: FUCK
+            // XXX: Handle error
         }
         else {
             // XXX: handle errors in JSON payload of successful response
-            return json_decode( wp_remote_retrieve_body( $response ) );
+            $resp = wp_remote_retrieve_body( $response );
+            $json = json_decode( wp_remote_retrieve_body( $response ) );
+            if ( $json ) {
+                return $json;
+            }
+            else {
+                // XXX: Handle rror
+            }
         }
     }
 
@@ -59,6 +70,12 @@ class NPR_API_Client {
         $metas = array(
             STORY_ID_META_KEY => $story->id,
         );
+
+        /*
+         * if ( $story->byline ) {
+
+        }
+         */
 
         if ( $existing ) {
             $created = false;

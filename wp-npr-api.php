@@ -13,6 +13,7 @@ class NPR_API {
     var $api_key = '';
 
     function get_npr_stories() {
+        // XXX: check to make sure the api key has been installed.
         ?>
         <div class="wrap">
             <?php screen_icon(); ?>
@@ -32,6 +33,11 @@ class NPR_API {
             // XXX: check that the API key is actually set
             $api = new NPR_API_Client( get_option( 'npr_api_key' ) );
             $story = $api->story_from_id( $story_id );
+            if ( ! $story ) {
+                // XXX: handle error
+                return;
+            }
+            
             $created = $api->update_post_from_story( $story );
             if ( $created ) {
                 echo 'Post created as a draft';
