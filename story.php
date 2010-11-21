@@ -3,6 +3,7 @@
 class JSON_Story_Converter {
     function convert( $api_story ) {
         $text = '$text'; // HACK to deal with API response keys
+        //var_dump( $api_story );
         $story = new NPR_Story();
 
         $story->id         = $api_story->id;
@@ -14,6 +15,23 @@ class JSON_Story_Converter {
         $story->api_link   = $this->_get_link_by_type( 'api', $api_story );
         $story->story_date = $api_story->storyDate->$text;
         $story->pub_date   = $api_story->pubDate->$text;
+
+        /*
+        if ( $api_story->audio ) {
+            // XXX: only deal with the primary clip for now
+            foreach ( $api_story->audio as $clip ) {
+                if ( $clip->type == 'primary' ) {
+                    $story->audio = array( 
+                        'id'          => $clip->id, 
+                        'title'       => $clip->title,
+                        'description' => $clip->description,
+                        'mp3'         => $clip->format->mp3->$text,
+                        'duration'    => $this->_minute_format( $clip->duration->$text ),
+                    );
+                }
+            }
+        }
+         */
 
         return $story;
     }
@@ -32,6 +50,12 @@ class JSON_Story_Converter {
                 return $link->$text;
             }
         }
+    }
+
+    protected function _minute_format( $seconds ) {
+        $minutes = absint( $seconds ) / 60;
+        $remain = absint( $seconds ) % 60;
+        return sprintf( '%d:%02d', $minutes, $remain );
     }
 }
 
@@ -61,7 +85,7 @@ class NPR_Story {
     public $keywords;
     public $priority_keywords;
     //public $organization;
-    //public $audio;
+    public $audio;
     //public $image;
     //public $related_link;
     //public $pull_quote;

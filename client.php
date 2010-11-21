@@ -8,6 +8,7 @@ define( 'STORY_ID_META_KEY', 'npr_story_id' );
 define( 'API_LINK_META_KEY', 'npr_api_link' );
 define( 'HTML_LINK_META_KEY', 'npr_html_link' );
 define( 'SHORT_LINK_META_KEY', 'npr_short_link' );
+define( 'AUDIO_META_KEY' , '_npr_audio_clip' );
 
 require_once( 'story.php' );
 
@@ -77,6 +78,7 @@ class NPR_API_Client {
     }
 
 
+    // XXX: this should be moved out of Client.
     function update_post_from_story( $story ) {
         $exists = new WP_Query( array( 'meta_key' => STORY_ID_META_KEY, 
                                        'meta_value' => $story->id ) );
@@ -97,6 +99,11 @@ class NPR_API_Client {
             HTML_LINK_META_KEY  => $story->html_link,
             SHORT_LINK_META_KEY => $story->short_link,
         );
+        /*
+        if ( $story->audio ) {
+            $metas[ AUDIO_META_KEY ] = serialize( $story->audio );
+        }
+         */
 
         if ( $existing ) {
             $created = false;
@@ -114,7 +121,5 @@ class NPR_API_Client {
         return array( $created, $id );
     }
 }
-
-
 
 ?>
