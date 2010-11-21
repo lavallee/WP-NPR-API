@@ -8,9 +8,11 @@ define( 'STORY_ID_META_KEY', 'npr_story_id' );
 class NPR_API_Client {
     private $api_key;
 
+
     function NPR_API_Client( $api_key ) {
         $this->api_key = $api_key;
     }
+
 
     function story_from_id( $id ) {
         $response = $this->_api_request( array( 'id' => $id ) );
@@ -22,6 +24,7 @@ class NPR_API_Client {
             }
         }
     }
+
 
     protected function _api_request( $args ) {
         $defaults = array(
@@ -82,7 +85,7 @@ class NPR_API_Client {
             update_post_meta( $id, $k, $v );
         }
 
-        return $created;
+        return array( $created, $id );
     }
 
 

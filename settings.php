@@ -15,6 +15,7 @@ function npr_api_options_page() {
     <div>
         <h2>NPR API settings</h2>
         <form action="options.php" method="post">
+            <p>If you don't have an API key, go <a href="http://www.npr.org/api/index">here</a> to get one.</p>
 
             <?php settings_fields( 'npr_api' ); ?>
             <?php do_settings_sections( 'npr_api' ); ?>
@@ -39,7 +40,7 @@ function npr_api_settings_callback() { }
 
 function npr_api_key_callback() {
     $option = get_option( 'npr_api_key' );
-    echo "<input type='text' value='$option' name='npr_api_key' />"; 
+    echo "<input type='text' value='$option' name='npr_api_key' style='width: 300px;' />"; 
 }
 
 

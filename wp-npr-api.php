@@ -9,29 +9,35 @@
 
 require_once( 'client.php' );
 require_once( 'settings.php' );
+define( 'NPR_API_KEY_OPTION', 'npr_api_key' );
 
 class NPR_API {
-    var $api_key = '';
+    var $created_message = '';
 
     function load_page_hook() {
         if ( isset( $_POST ) && isset( $_POST[ 'story_id' ] ) ) {
             $story_id = absint( $_POST[ 'story_id' ] );
 
             // XXX: check that the API key is actually set
-            $api = new NPR_API_Client( get_option( 'npr_api_key' ) );
+            $api = new NPR_API_Client( get_option( NPR_API_KEY_OPTION ) );
             $story = $api->story_from_id( $story_id );
             if ( ! $story ) {
                 // XXX: handle error
                 return;
             }
             
-            $created = $api->update_post_from_story( $story );
+            $resp = $api->update_post_from_story( $story );
+            $created = $resp[0];
+            $id = $resp[1];
+
+            $text = '$text'; // XXX: replace with real story object
             if ( $created ) {
-                echo 'Post created as a draft';
+                $msg = sprintf( 'Created <a href="%s">%s</a> as a Draft.',  get_edit_post_link( $id ), $story->title->$text );
             }
             else {
-                echo 'Existing post updated';
+                $msg = sprintf( 'Updated <a href="%s">%s</a>.', get_edit_post_link( $id ), $story->title->$text );
             }
+            $this->created_message = $msg;
         }
     }
 
@@ -42,9 +48,21 @@ class NPR_API {
             <?php screen_icon(); ?>
             <form action="" method="POST">
             <h2>Get NPR Stories</h2>
+            <?php if ( ! get_option( NPR_API_KEY_OPTION ) ) : ?>
+            <div class="error">
+                <p>You don't currently have an API key set.  <a href="<?php menu_page_url( 'npr_api' ); ?>">Set your API key here.</a></p>
+            </div>
+            <?php endif; 
+            if ( isset( $_POST ) ): ?>
+            <div class="updated">
+                <p><?php echo $this->created_message; ?></p>
+            </div>
+            <?php endif; ?>
+            
             Enter an NPR Story ID: <input type="text" name="story_id" value="" />
             <input type="submit" value="Create Draft" />
             </form>
+
        </div>
         <?php
     }
