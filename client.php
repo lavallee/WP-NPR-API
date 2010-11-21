@@ -40,7 +40,7 @@ class NPR_API_Client {
         else {
             // XXX: handle errors in JSON payload of successful response
             $resp = wp_remote_retrieve_body( $response );
-            $json = json_decode( wp_remote_retrieve_body( $response ) );
+            $json = json_decode( wp_remote_retrieve_body( $resp ) );
             if ( $json ) {
                 return $json;
             }
