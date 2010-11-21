@@ -8,23 +8,10 @@
  */
 
 require_once( 'client.php' );
+require_once( 'settings.php' );
 
 class NPR_API {
     var $api_key = '';
-
-    function get_npr_stories() {
-        // XXX: check to make sure the api key has been installed.
-        ?>
-        <div class="wrap">
-            <?php screen_icon(); ?>
-            <form action="" method="POST">
-            <h2>Get NPR Stories</h2>
-            Enter an NPR Story ID: <input type="text" name="story_id" value="" />
-            <input type="submit" value="Create Draft" />
-            </form>
-       </div>
-        <?php
-    }
 
     function load_page_hook() {
         if ( isset( $_POST ) && isset( $_POST[ 'story_id' ] ) ) {
@@ -46,6 +33,20 @@ class NPR_API {
                 echo 'Existing post updated';
             }
         }
+    }
+
+    function get_npr_stories() {
+        // XXX: check to make sure the api key has been installed.
+        ?>
+        <div class="wrap">
+            <?php screen_icon(); ?>
+            <form action="" method="POST">
+            <h2>Get NPR Stories</h2>
+            Enter an NPR Story ID: <input type="text" name="story_id" value="" />
+            <input type="submit" value="Create Draft" />
+            </form>
+       </div>
+        <?php
     }
 
     function admin_menu() {
