@@ -7,7 +7,17 @@ class JSON_Story_Converter {
         $story->id = $api_story->id;
         $story->title = $api_story->title->$text;
         $story->content = $this->_paragraphs_to_html( $api_story->textWithHtml );
-        $story->teaser = $this->teaser->$text;
+        $story->teaser = $api_story->teaser->$text;
+        $story->story_date = $api_story->storyDate->$text;
+        $story->pub_date = $api_story->pubDate->$text;
+        
+        foreach( $api_story->link as $link ){
+            if ( $link->type == 'html' ) {
+                $story->link = $link->$text;
+                break;
+            }
+        }
+                
         return $story;
     }
 
