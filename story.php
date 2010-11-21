@@ -12,8 +12,8 @@ class JSON_Story_Converter {
         $story->html_link  = $this->_get_link_by_type( 'html', $api_story );
         $story->short_link = $this->_get_link_by_type( 'short', $api_story );
         $story->api_link   = $this->_get_link_by_type( 'api', $api_story );
-        $story->story_date = $api_story->storyDate->$text;
-        $story->pub_date   = $api_story->pubDate->$text;
+        $story->story_date = strtotime($api_story->storyDate->$text);
+        $story->pub_date   = strtotime($api_story->pubDate->$text);
 
         return $story;
     }

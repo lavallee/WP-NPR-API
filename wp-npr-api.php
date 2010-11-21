@@ -90,16 +90,16 @@ class NPR_API {
                 <thead>
                     <tr>
                         <th scope="col">Title</th>
+                        <th scope="col">Date</th>
                         <th scope="col">Description</th>
-                        <th scope="col">ID</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
                         <th scope="col">Title</th>
+                        <th scope="col">Date</th>
                         <th scope="col">Description</th>
-                        <th scope="col">ID</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </tfoot>
@@ -107,14 +107,14 @@ class NPR_API {
                 <?php foreach( $recent_stories as $story ): ?>
                         <tr>
                             <td class="name">
-                                <a href="<?php echo $story->link ?>" title="<?php echo $story->title ?>" target="_blank">
+                                <strong><a href="<?php echo $story->html_link ?>" title="<?php echo $story->title ?>" target="_blank">
                                     <?php echo $story->title ?>
-                                </a>
+                                </a></strong>
                             </td>
-                            <td><?php echo $story->teaser ?></td>
-                            <td><?php echo $story->id ?></td>
+                            <td class='date'><?php echo strftime('%m/%d/%Y', $story->story_date) ?>
+                            <td class='description'><?php echo $story->teaser ?></td>
                             
-                            <td>
+                            <td class="actions" style="width:100px">
                                 <a href="<?php echo add_query_arg( array('story_id' => $story->id, 'create_draft' => 'true' ), menu_page_url( 'get-npr-stories', false ) ) ?>">
                                     Save to Drafts
                                 </a>
