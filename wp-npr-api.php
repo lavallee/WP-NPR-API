@@ -44,7 +44,7 @@ class NPR_API {
         // XXX: check to make sure the api key has been installed.
         
         if ( get_option( NPR_API_KEY ) ) { 
-            $api = new NPR_API_CLIENT( get_option( NPR_API_KEY_OPTION ) );
+            $api = new NPR_API_Client( get_option( NPR_API_KEY_OPTION ) );
             $recent_stories = $api->recent_stories();
         }
         

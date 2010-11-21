@@ -19,8 +19,10 @@ class JSON_Story_Converter {
     }
 
     protected function _paragraphs_to_html( $pgs ) {
-        $grafs = array_map( 'text_from_paragraph', $pgs->paragraph );
-        return implode( "\n\n", $grafs );
+        if ( $pgs->paragraph ) {
+            $grafs = array_map( 'text_from_paragraph', $pgs->paragraph );
+            return implode( "\n\n", $grafs );
+        }
     }
 
     protected function _get_link_by_type( $type, $as ) {

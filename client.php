@@ -40,17 +40,17 @@ class NPR_API_Client {
         
             $stories = array();
             $converter = new JSON_Story_Converter();
-        
-            foreach ( $response->list->story as $story) {
+
+            foreach ( $response->list->story as $story ) {
                 array_push( $stories, $converter->convert( $story ) );
             }
-            
+
             return $stories;
         }
     }
 
 
-    protected function _api_request( $args, $action = null ) {
+    protected function _api_request( $args = array(), $action = null ) {
         $defaults = array(
             'output' => OUTPUT_FORMAT,
             'fields' => FIELDS,
