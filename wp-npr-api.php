@@ -30,12 +30,11 @@ class NPR_API {
             $created = $resp[0];
             $id = $resp[1];
 
-            $text = '$text'; // XXX: replace with real story object
             if ( $created ) {
-                $msg = sprintf( 'Created <a href="%s">%s</a> as a Draft.',  get_edit_post_link( $id ), $story->title->$text );
+                $msg = sprintf( 'Created <a href="%s">%s</a> as a Draft.',  get_edit_post_link( $id ), $story->title );
             }
             else {
-                $msg = sprintf( 'Updated <a href="%s">%s</a>.', get_edit_post_link( $id ), $story->title->$text );
+                $msg = sprintf( 'Updated <a href="%s">%s</a>.', get_edit_post_link( $id ), $story->title );
             }
             $this->created_message = $msg;
         }
@@ -53,7 +52,7 @@ class NPR_API {
                 <p>You don't currently have an API key set.  <a href="<?php menu_page_url( 'npr_api' ); ?>">Set your API key here.</a></p>
             </div>
             <?php endif; 
-            if ( isset( $_POST ) ): ?>
+            if ( isset( $_POST ) and isset( $_POST[ 'story_id' ] ) ): ?>
             <div class="updated">
                 <p><?php echo $this->created_message; ?></p>
             </div>
@@ -82,3 +81,4 @@ class NPR_API {
 }
 
 new NPR_API;
+

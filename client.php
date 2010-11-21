@@ -5,6 +5,8 @@ define( 'OUTPUT_FORMAT', 'JSON' );
 define( 'FIELDS', 'all' );
 define( 'STORY_ID_META_KEY', 'npr_story_id' );
 
+require_once( 'story.php' );
+
 class NPR_API_Client {
     private $api_key;
 
@@ -19,7 +21,8 @@ class NPR_API_Client {
         if ( $response ) {
             foreach ( $response->list->story as $story ) {
                 if ( $story->id == $id ) {
-                    return $story;
+                    $converter = new JSON_Story_Converter();
+                    return $converter->convert( $story );
                 }
             }
         }
@@ -54,23 +57,16 @@ class NPR_API_Client {
             // XXX: might be more than one here;
             $existing = $exists->post;
         }
-            
-        $text = '$text';
 
         $args = array(
-            'post_title' => $story->title->$text,
-            'post_content' => $this->_paragraphs_to_html( $story->textWithHtml ),
+            'post_title' => $story->title,
+            'post_content' => $story->content,
+            'post_excerpt' => $story->teaser,
             'post_status' => 'draft',
         );
         $metas = array(
             STORY_ID_META_KEY => $story->id,
         );
-
-        /*
-         * if ( $story->byline ) {
-
-        }
-         */
 
         if ( $existing ) {
             $created = false;
@@ -87,17 +83,8 @@ class NPR_API_Client {
 
         return array( $created, $id );
     }
-
-
-    protected function _paragraphs_to_html( $pgs ) {
-        $grafs = array_map( 'text_from_paragraph', $pgs->paragraph );
-        return implode( "\n\n", $grafs );
-    }
 }
 
-function text_from_paragraph( $graf ) {
-    $text = '$text';
-    return $graf->$text;
-}
+
 
 ?>
