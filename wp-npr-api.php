@@ -9,6 +9,7 @@
 
 require_once( 'client.php' );
 require_once( 'settings.php' );
+require_once( 'embed.php' );
 define( 'NPR_API_KEY_OPTION', 'npr_api_key' );
 
 class NPR_API {
