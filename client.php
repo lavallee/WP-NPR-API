@@ -1,6 +1,7 @@
 <?php
 
-define( 'NPR_API_URL', 'http://api.npr.org/query' );
+define( 'NPR_API_URL', 'http://api.npr.org/' );
+define( 'NPR_API_DEFAULT_ACTION', 'query' );
 define( 'OUTPUT_FORMAT', 'JSON' );
 define( 'FIELDS', 'all' );
 define( 'STORY_ID_META_KEY', 'npr_story_id' );
@@ -27,20 +28,42 @@ class NPR_API_Client {
             }
         }
     }
+    
+    function recent_stories() {
+        $response = $this->_api_request();
+                
+        if ( $response ) {
+        
+            $stories = array();
+            $converter = new JSON_Story_Converter();
+        
+            foreach ( $response->list->story as $story) {
+                array_push( $stories, $converter->convert( $story ) );
+            }
+            
+            return $stories;
+        }
+    }
 
 
-    protected function _api_request( $args ) {
+    protected function _api_request( $args, $action = null ) {
         $defaults = array(
             'output' => OUTPUT_FORMAT,
             'fields' => FIELDS,
             'apiKey' => $this->api_key,
         );
+        
+        if ( !isset($action) ) {
+            $action = NPR_API_DEFAULT_ACTION;
+        }
+        
         $params = wp_parse_args( $args, $defaults );
-
-        $url = add_query_arg( $params, NPR_API_URL );
+        $url = add_query_arg( $params, NPR_API_URL . $action );        
         $response = wp_remote_get( $url );
+                
         if ( is_wp_error( $response ) ) {
             // XXX: Handle error
+            
         }
         else {
             // XXX: handle errors in JSON payload of successful response
