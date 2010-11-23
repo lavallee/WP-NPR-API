@@ -99,11 +99,9 @@ class NPR_API_Client {
             HTML_LINK_META_KEY  => $story->html_link,
             SHORT_LINK_META_KEY => $story->short_link,
         );
-        /*
         if ( $story->audio ) {
             $metas[ AUDIO_META_KEY ] = serialize( $story->audio );
         }
-         */
 
         if ( $existing ) {
             $created = false;

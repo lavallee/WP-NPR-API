@@ -16,7 +16,6 @@ class JSON_Story_Converter {
         $story->story_date = strtotime($api_story->storyDate->$text);
         $story->pub_date   = strtotime($api_story->pubDate->$text);
 
-        /*
         if ( $api_story->audio ) {
             // XXX: only deal with the primary clip for now
             foreach ( $api_story->audio as $clip ) {
@@ -31,7 +30,6 @@ class JSON_Story_Converter {
                 }
             }
         }
-         */
 
         return $story;
     }

@@ -132,16 +132,23 @@ class NPR_API {
         add_posts_page( 'Get NPR Stories', 'Get NPR Stories', 'edit_posts', 'get-npr-stories', array( &$this, 'get_npr_stories' ) );
     }
 
-    function embed_audio_clip() {
+    function embed_audio_clip( $text ) {
         global $post;
-        if ( has_meta( $post, AUDIO_META_KEY ) ) {
-            $clip = unserialize();
+        $clip = get_post_meta( $post->ID, '_npr_audio_clip', true );
+        if ( $clip ) { 
+            $clip = unserialize( $clip );
         }
+
+        $clip_title = 'Listen to this segment.';
+        $content = sprintf( '<a href="%s">%s</a>', $clip[ 'mp3' ], $clip_title );
+        $content .= $text;
+
+        return $content;
     }
 
     function NPR_API() {
         if ( ! is_admin() ) {
-            //add_action( 'the_content', array( &$this, 'embed_audio_clip' ) );
+            add_filter( 'the_content', array( &$this, 'embed_audio_clip' ) );
             return;
         }
 
