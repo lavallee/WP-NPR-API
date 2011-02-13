@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * Plugin Name: Embed for the NPR API
- * Description: Woo.
- * Version: 0.1-alpha
+ * Description: oEmbed handler for stories on NPR.org.
+ * Version: 0.1
  * Author: Marc Lavallee and Andrew Nacin
  * License: GPLv2
  */

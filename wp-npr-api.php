@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * Plugin Name: NPR API
- * Description: Woo.
- * Version: 0.1-alpha
+ * Description: A collection of tools for reusing content from NPR.org.
+ * Version: 0.1
  * Author: Marc Lavallee and Andrew Nacin
  * License: GPLv2
  */
@@ -10,6 +10,7 @@
 require_once( 'client.php' );
 require_once( 'settings.php' );
 require_once( 'embed.php' );
+
 define( 'NPR_API_KEY_OPTION', 'npr_api_key' );
 
 class NPR_API {
