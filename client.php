@@ -1,16 +1,11 @@
 <?php
+require_once( 'story.php' );
 
 define( 'NPR_API_URL', 'http://api.npr.org/' );
 define( 'NPR_API_DEFAULT_ACTION', 'query' );
-define( 'OUTPUT_FORMAT', 'JSON' );
-define( 'FIELDS', 'all' );
-define( 'STORY_ID_META_KEY', 'npr_story_id' );
-define( 'API_LINK_META_KEY', 'npr_api_link' );
-define( 'HTML_LINK_META_KEY', 'npr_html_link' );
-define( 'SHORT_LINK_META_KEY', 'npr_short_link' );
-define( 'AUDIO_META_KEY' , '_npr_audio_clip' );
+define( 'NPR_OUTPUT_FORMAT', 'JSON' );
+define( 'NPR_FIELDS', 'all' );
 
-require_once( 'story.php' );
 
 class NPR_API_Client {
     private $api_key;
@@ -53,8 +48,8 @@ class NPR_API_Client {
 
     protected function _api_request( $args = array(), $action = null ) {
         $defaults = array(
-            'output' => OUTPUT_FORMAT,
-            'fields' => FIELDS,
+            'output' => NPR_OUTPUT_FORMAT,
+            'fields' => NPR_FIELDS,
             'apiKey' => $this->api_key,
         );
         
@@ -75,50 +70,6 @@ class NPR_API_Client {
             $resp = wp_remote_retrieve_body( $response );
             return json_decode( $resp );
         }
-    }
-
-
-    // XXX: this should be moved out of Client.
-    function update_post_from_story( $story ) {
-        $exists = new WP_Query( array( 'meta_key' => STORY_ID_META_KEY, 
-                                       'meta_value' => $story->id ) );
-        if ( $exists->post_count ) {
-            // XXX: might be more than one here;
-            $existing = $exists->post;
-        }
-
-        $args = array(
-            'post_title'   => $story->title,
-            'post_content' => $story->content,
-            'post_excerpt' => $story->teaser,
-            'post_status'  => 'draft',
-        );
-        $metas = array(
-            STORY_ID_META_KEY   => $story->id,
-            API_LINK_META_KEY   => $story->api_link,
-            HTML_LINK_META_KEY  => $story->html_link,
-            SHORT_LINK_META_KEY => $story->short_link,
-        );
-        /*
-        if ( $story->audio ) {
-            $metas[ AUDIO_META_KEY ] = serialize( $story->audio );
-        }
-         */
-
-        if ( $existing ) {
-            $created = false;
-            $args[ 'ID' ] = $existing->ID;
-        }
-        else {
-            $created = true;
-        }
-        $id = wp_insert_post( $args );
-
-        foreach ( $metas as $k => $v ) {
-            update_post_meta( $id, $k, $v );
-        }
-
-        return array( $created, $id );
     }
 }
 

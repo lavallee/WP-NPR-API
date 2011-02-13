@@ -8,8 +8,9 @@
  */
 
 require_once( 'client.php' );
-require_once( 'settings.php' );
 require_once( 'embed.php' );
+require_once( 'settings.php' );
+require_once( 'story.php' );
 
 define( 'NPR_API_KEY_OPTION', 'npr_api_key' );
 
@@ -36,7 +37,8 @@ class NPR_API {
                 return;
             }
             
-            $resp = $api->update_post_from_story( $story );
+            $poster = new Story_Poster;
+            $resp = $poster->update_post_from_story( $story );
             $created = $resp[0];
             $id = $resp[1];
 
@@ -153,3 +155,25 @@ class NPR_API {
 
 new NPR_API;
 
+function npr_api_handle_nprstory( $atts ) {
+    global $post;
+
+    extract( shortcode_atts( $atts, array() ) );
+    $content = get_post_meta( $post->ID, 'npr_story_content', true );
+    return apply_filters( 'the_content', $content );
+}
+
+add_shortcode( 'nprstory', 'npr_api_handle_nprstory' );
+
+
+function npr_api_authorizer( $displayname ) {
+    global $post;
+
+    if ( get_post_meta( $post->ID, NPR_BYLINE_META_KEY, true ) ) {
+        return get_post_meta( $post->ID, NPR_BYLINE_META_KEY, true );
+    }
+    else {
+        return $displayname;
+    }
+}
+add_filter( 'the_author', 'npr_api_authorizer', 11 );
