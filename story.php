@@ -1,4 +1,7 @@
 <?php
+/**
+ * A value object representing a single NPR Story from the NPR API.
+ */
 class NPR_Story {
     // Fields from NPR API
     public $id;
@@ -29,11 +32,16 @@ class NPR_Story {
     public $body;
 }
 
-
+/**
+ * Converts JSON data structures returned by the NPR API into NPR_Story
+ * objects.
+ *
+ * @todo factor the non-JSON-specific converter methods into a superclass or 
+ * mixin.
+ */
 class JSON_Story_Converter {
     function convert( $api_story ) {
-        $text = '$text'; // HACK to deal with API response keys
-        //var_dump( $api_story );
+        $text = '$text'; // HACK to deal with $s in API response keys
         $story = new NPR_Story();
 
         $story->id         = $api_story->id;
@@ -78,7 +86,7 @@ class JSON_Story_Converter {
 
 
     protected function _get_link_by_type( $type, $as ) {
-        $text = '$text';
+        $text = '$text'; // HACK to deal with $s in API response keys
         foreach ( $as->link as $link ) {
             if ( $link->type == $type ) {
                 return $link->$text;
@@ -88,7 +96,7 @@ class JSON_Story_Converter {
 
 
     protected function _handle_byline( $byline ) {
-        $text = '$text';
+        $text = '$text'; // HACK to deal with $s in API response keys
 
         $people = array();
         foreach ( $byline as $person ) {
@@ -106,18 +114,16 @@ class JSON_Story_Converter {
     }
 }
 
+/**
+ * @todo see about putting this in the Coverter class and passing something
+ * else to array_map.
+ */
 function text_from_paragraph( $graf ) {
-    $text = '$text';
+    $text = '$text'; // HACK to deal with $s in API response keys
     return $graf->$text;
 }
 
-define( 'NPR_STORY_ID_META_KEY', 'npr_story_id' );
-define( 'NPR_API_LINK_META_KEY', 'npr_api_link' );
-define( 'NPR_HTML_LINK_META_KEY', 'npr_html_link' );
-define( 'NPR_SHORT_LINK_META_KEY', 'npr_short_link' );
-define( 'NPR_STORY_CONTENT_META_KEY', 'npr_story_content' );
-define( 'NPR_BYLINE_META_KEY', 'npr_byline' );
-define( 'NPR_AUDIO_META_KEY', '_npr_audio_clip' );
+
 class Story_Poster {
     /**
      * Creates or updates a WordPress post with a story object.
@@ -132,15 +138,19 @@ class Story_Poster {
             // XXX: might be more than one here;
             $existing = $exists->post;
         }
+        else {
+            $existing = null;
+        }
 
-        // @todo need to check existing post_content before overwriting
-        // with new shortcode
         $args = array(
             'post_title'   => $story->title,
             'post_excerpt' => $story->teaser,
-            'post_content' => '[nprstory id="' . $story->id . '"]',
-            'post_status'  => 'draft',
+            'post_content' => $this->_set_or_update_content($story, $existing ),
         );
+        if ( ! $existing ) {
+            $args['post_status'] = 'draft';
+        }
+
         $metas = array(
             NPR_STORY_ID_META_KEY      => $story->id,
             NPR_API_LINK_META_KEY      => $story->api_link,
@@ -170,8 +180,36 @@ class Story_Poster {
 
         return array( $created, $id );
     }
-}
 
+
+    /**
+     * Looks for the nprstory shortcode in existing content and
+     * appends/inserts as necessary.
+     * 
+     * @param $story NPR_Story object.
+     * @param $existing 
+     */
+    function _set_or_update_content( $story, $existing ) {
+        $story_shortcode = '[nprstory id="' . $story->id . '"]';
+
+        if ( $existing ) {
+            // Look for [nprstory] in the content. 
+            // If it's there, leave it alone
+            $old_content = $existing->post_content;
+            if ( preg_match( '/\[\s*nprstory\s+id\s*=\s*"(\d+)"\s*\]/',
+                $old_content ) ) {
+                    return $old_content;
+            }
+            // Otherwise, (re)insert it at the end.
+            else {
+                return $old_content . "\n" . $story_shortcode;
+            }
+        }
+        else {
+            return $story_shortcode;
+        }
+    }
+}
 
 
 ?>

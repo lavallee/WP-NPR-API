@@ -6,13 +6,19 @@
  * Author: Marc Lavallee and Andrew Nacin
  * License: GPLv2
  */
+define( 'NPR_API_KEY_OPTION', 'npr_api_key' );
+define( 'NPR_STORY_ID_META_KEY', 'npr_story_id' );
+define( 'NPR_API_LINK_META_KEY', 'npr_api_link' );
+define( 'NPR_HTML_LINK_META_KEY', 'npr_html_link' );
+define( 'NPR_SHORT_LINK_META_KEY', 'npr_short_link' );
+define( 'NPR_STORY_CONTENT_META_KEY', 'npr_story_content' );
+define( 'NPR_BYLINE_META_KEY', 'npr_byline' );
+define( 'NPR_AUDIO_META_KEY', '_npr_audio_clip' );
 
 require_once( 'client.php' );
 require_once( 'embed.php' );
 require_once( 'settings.php' );
 require_once( 'story.php' );
-
-define( 'NPR_API_KEY_OPTION', 'npr_api_key' );
 
 class NPR_API {
     var $created_message = '';
@@ -55,7 +61,7 @@ class NPR_API {
     function get_npr_stories() {
         // XXX: check to make sure the api key has been installed.
         
-        if ( get_option( NPR_API_KEY ) ) { 
+        if ( get_option( NPR_API_KEY_OPTION ) ) { 
             $api = new NPR_API_Client( get_option( NPR_API_KEY_OPTION ) );
             $recent_stories = $api->recent_stories();
         }
@@ -155,6 +161,10 @@ class NPR_API {
 
 new NPR_API;
 
+/**
+ * Shortcode handler for NPR story content.
+ * @global $post current Post object.
+ */
 function npr_api_handle_nprstory( $atts ) {
     global $post;
 
@@ -162,11 +172,15 @@ function npr_api_handle_nprstory( $atts ) {
     $content = get_post_meta( $post->ID, 'npr_story_content', true );
     return apply_filters( 'the_content', $content );
 }
-
 add_shortcode( 'nprstory', 'npr_api_handle_nprstory' );
 
 
-function npr_api_authorizer( $displayname ) {
+/**
+ * Replaces the author line with the appropriate NPR author.
+ *
+ * @global $post Current WP Post.
+ */
+function npr_api_author_filter( $displayname ) {
     global $post;
 
     if ( get_post_meta( $post->ID, NPR_BYLINE_META_KEY, true ) ) {
@@ -176,4 +190,4 @@ function npr_api_authorizer( $displayname ) {
         return $displayname;
     }
 }
-add_filter( 'the_author', 'npr_api_authorizer', 11 );
+add_filter( 'the_author', 'npr_api_author_filter', 11 );
