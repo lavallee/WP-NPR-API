@@ -3,9 +3,25 @@
  * Plugin Name: NPR API
  * Description: A collection of tools for reusing content from NPR.org.
  * Version: 0.1
- * Author: Marc Lavallee and Andrew Nacin
+ * Author: Marc Lavallee 
  * License: GPLv2
- */
+*/
+/*
+    Copyright 2011 Marc Lavallee  (email : mlavallee@gmail.com)
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License, version 2, as 
+    published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 define( 'NPR_API_KEY_OPTION', 'npr_api_key' );
 define( 'NPR_STORY_ID_META_KEY', 'npr_story_id' );
 define( 'NPR_API_LINK_META_KEY', 'npr_api_link' );
@@ -31,7 +47,6 @@ class NPR_API {
         else if ( isset( $_GET[ 'create_draft' ] ) && isset( $_GET[ 'story_id' ] ) ) {
             $story_id = absint( $_GET[ 'story_id' ] );
         }
-        
         
         if ( isset( $story_id ) ) {
 
@@ -59,34 +74,75 @@ class NPR_API {
     }
 
     function get_npr_stories() {
-        // XXX: check to make sure the api key has been installed.
-        
-        if ( get_option( NPR_API_KEY_OPTION ) ) { 
-            $api = new NPR_API_Client( get_option( NPR_API_KEY_OPTION ) );
-            $recent_stories = $api->recent_stories();
-        }
-        
-        ?>
+        global $is_IE;
+        $api = new NPR_API_Client( get_option( NPR_API_KEY_OPTION ) );
+?>
         <div class="wrap">
             <?php screen_icon(); ?>
-            <form action="" method="POST">
             <h2>Get NPR Stories</h2>
             <?php if ( ! $api ) : ?>
-            <div class="error">
-                <p>You don't currently have an API key set.  <a href="<?php menu_page_url( 'npr_api' ); ?>">Set your API key here.</a></p>
-            </div>
+                <div class="error">
+                    <p>You don't currently have an API key set.  <a href="<?php menu_page_url( 'npr_api' ); ?>">Set your API key here.</a></p>
+                </div>
             <?php endif; 
             if ( ( isset( $_POST ) and isset( $_POST[ 'story_id' ] ) ) || ( isset( $_GET['create_draft'] ) && isset( $_GET['story_id'] ) ) ): ?>
-            <div class="updated">
-                <p><?php echo $this->created_message; ?></p>
-            </div>
+                <div class="updated">
+                    <p><?php echo $this->created_message; ?></p>
+                </div>
             <?php endif; ?>
-            
-            Enter an NPR Story ID: <input type="text" name="story_id" value="" />
-            <input type="submit" value="Create Draft" />
-            </form>
-            
-            <?php if ( $api ): ?>
+
+            <div style="float: left;">
+                <form action="" method="POST">
+                    Enter an NPR Story ID: <input type="text" name="story_id" value="" />
+                    <input type="submit" value="Create Draft" />
+                </form>
+            </div>
+ 
+
+            <div style="float: right; width: 450px;">
+            <p>
+            <?php // @todo move inline style and javascript somewhere better ?>
+                <!-- Thank you to Marco Arment of Instapaper, from where the bookmarklet style and UX have been lifted. -->
+                <style>
+                    .bookmarklet {
+                        display: inline-block;
+                        font-family: 'Lucida Grande', Verdana, sans-serif;
+                        font-weight: bold;
+                        font-size: 11px;
+                        -webkit-border-radius: 8px;
+                        -moz-border-radius: 8px;
+                        border-radius: 8px;
+                        color: #fff;
+                        background-color: #626262;
+                        border: 1px solid #626262;
+                        padding: 0px 7px 1px 7px;
+                        text-shadow: #3b3b3b 1px 1px 0px;
+                        min-width: 62px;
+                        text-align: center;
+                        text-decoration: none;
+                        vertical-align: 2px;
+                    }
+                </style>
+                <script>
+                    function explain_bookmarklet() {
+                        <?php if ( $is_IE ): ?>
+                            alert( 'To use this bookmarklet, right-click on this button and choose "Add to favorites."' );
+                        <?php else: ?>
+                            alert( 'To use this bookmarklet, drag it to your browser\'s bookmarks bar.' );
+                        <?php endif; ?>
+                        return false;
+                    }
+                </script>
+                Import stories from NPR.org to your WordPress blog with this bookmarklet. To install:<br /> 
+                <strong><?php echo ( $is_IE ) ? 'Right-click this button' : 'Drag this button'; ?></strong>
+                <a class="bookmarklet" onClick="return explain_bookmarklet();" title="Import a story from NPR.org to your WordPress blog." href="javascript:(function(){document.body.appendChild(document.createElement('script')).src='<?php echo plugin_dir_url(__FILE__); ?>bookmarklet-handler.php';})();">Add NPR story to WP</a>
+                <?php echo ( $is_IE ) ? ' and choose "Add to favorites."' : 'to your browser\'s bookmarks bar.'; ?>
+            </p>
+            </div>
+           
+            <?php if ( $api ): 
+                $recent_stories = $api->recent_stories();
+            ?>
             <div class="tablenav">
                 <div class="alignleft actions">
                     <p class="displaying-num">Displaying <?php echo count($recent_stories) ?> recent stories.</p>
@@ -163,7 +219,8 @@ new NPR_API;
 
 /**
  * Shortcode handler for NPR story content.
- * @global $post current Post object.
+ *
+ * @global $post current WP Post object.
  */
 function npr_api_handle_nprstory( $atts ) {
     global $post;
@@ -176,9 +233,9 @@ add_shortcode( 'nprstory', 'npr_api_handle_nprstory' );
 
 
 /**
- * Replaces the author line with the appropriate NPR author.
+ * Replaces the author line of a post with the appropriate NPR byline.
  *
- * @global $post Current WP Post.
+ * @global $post Current WP Post object.
  */
 function npr_api_author_filter( $displayname ) {
     global $post;

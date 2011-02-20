@@ -36,7 +36,7 @@ class NPR_Story {
  * Converts JSON data structures returned by the NPR API into NPR_Story
  * objects.
  *
- * @todo factor the non-JSON-specific converter methods into a superclass or 
+ * @todo move the non-JSON-specific converter methods into a superclass or 
  * mixin.
  */
 class JSON_Story_Converter {
@@ -46,8 +46,10 @@ class JSON_Story_Converter {
 
         $story->id         = $api_story->id;
         $story->title      = $api_story->title->$text;
-        $story->content    = $this->_paragraphs_to_html( 
-            $api_story->textWithHtml );
+        if ( property_exists( $api_story, 'textWithHtml' ) ) {
+            $story->content = $this->_paragraphs_to_html( 
+                        $api_story->textWithHtml );
+        }
         $story->teaser     = $api_story->teaser->$text;
         $story->html_link  = $this->_get_link_by_type( 'html', $api_story );
         $story->short_link = $this->_get_link_by_type( 'short', $api_story );
@@ -120,7 +122,8 @@ class JSON_Story_Converter {
  */
 function text_from_paragraph( $graf ) {
     $text = '$text'; // HACK to deal with $s in API response keys
-    return $graf->$text;
+    if ( property_exists( $graf, $text ) )
+        return $graf->$text;
 }
 
 
